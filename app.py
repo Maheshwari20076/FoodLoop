@@ -31,7 +31,7 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    # --- Blueprints ----------------------------------------------------------
+    # --- Blueprints ---------------------------------------------------------
     from routes.main import main_bp
     from routes.auth import auth_bp
     from routes.donor import donor_bp
@@ -44,17 +44,23 @@ def create_app(config_class=Config):
     app.register_blueprint(recipient_bp)
     app.register_blueprint(admin_bp)
 
-    # --- Template context ------------------------------------------------
+    # --- Template context ---------------------------------------------------
     @app.context_processor
     def inject_globals():
         unread_count = 0
+
         if current_user.is_authenticated:
             unread_count = Notification.query.filter_by(
-                user_id=current_user.id, is_read=False
+                user_id=current_user.id,
+                is_read=False
             ).count()
-        return {"current_year": datetime.utcnow().year, "unread_notifications": unread_count}
 
-    # --- Error handlers ----------------------------------------------------
+        return {
+            "current_year": datetime.utcnow().year,
+            "unread_notifications": unread_count
+        }
+
+    # --- Error handlers -----------------------------------------------------
     @app.errorhandler(403)
     def forbidden(e):
         return render_template("errors/403.html"), 403
@@ -67,9 +73,18 @@ def create_app(config_class=Config):
     def server_error(e):
         return render_template("errors/500.html"), 500
 
-    # --- Ensure folders exist ------------------------------------------------
+    # --- Ensure folders exist -----------------------------------------------
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-    os.makedirs(os.path.join(os.path.dirname(__file__), "database"), exist_ok=True)
+    os.makedirs(
+        os.path.join(os.path.dirname(__file__), "database"),
+        exist_ok=True
+    )
+
+    # --- Initialize database tables -----------------------------------------
+    # Required when running with Gunicorn/Render because the
+    # `if __name__ == "__main__"` block is not executed.
+    with app.app_context():
+        db.create_all()
 
     # --- CLI helper: `flask create-db` --------------------------------------
     @app.cli.command("create-db")
@@ -77,6 +92,7 @@ def create_app(config_class=Config):
         """Create all database tables."""
         with app.app_context():
             db.create_all()
+
         print("Database tables created.")
 
     return app
@@ -84,7 +100,13 @@ def create_app(config_class=Config):
 
 app = create_app()
 
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(host="0.0.0.0", port=5000, debug=app.config.get("DEBUG", True))
+
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=app.config.get("DEBUG", True)
+    )
