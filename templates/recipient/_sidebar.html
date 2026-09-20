@@ -1,0 +1,12 @@
+<a class="nav-link {{ 'active' if request.endpoint == 'recipient.dashboard' }}" href="{{ url_for('recipient.dashboard') }}">
+  <i class="bi bi-grid-1x2"></i> Dashboard
+</a>
+<a class="nav-link {{ 'active' if request.endpoint in ['recipient.find_food','recipient.donation_details'] }}" href="{{ url_for('recipient.find_food') }}">
+  <i class="bi bi-search"></i> Find Food
+</a>
+<a class="nav-link {{ 'active' if request.endpoint in ['recipient.my_claims','recipient.claim_confirmation'] }}" href="{{ url_for('recipient.my_claims') }}">
+  <i class="bi bi-bag-check"></i> My Claims
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'recipient.impact' }}" href="{{ url_for('recipient.impact') }}">
+  <i class="bi bi-bar-chart-line"></i> Impact
+</a>

@@ -1,0 +1,89 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Find Food{% endblock %}
+{% block sidebar_links %}{% include "recipient/_sidebar.html" %}{% endblock %}
+{% block page_title %}Find Food{% endblock %}
+{% block page_subtitle %}{{ results|length }} donation(s) available now{% endblock %}
+
+{% block dash_content %}
+<div class="fl-card fl-card-pad mb-4">
+  <form method="GET" class="row g-3 align-items-end">
+    <div class="col-6 col-md-2">
+      <label class="form-label">Category</label>
+      <select name="category" class="form-select form-select-sm" data-autosubmit>
+        <option value="">All</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {{ 'selected' if selected_category == c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label">Priority</label>
+      <select name="priority" class="form-select form-select-sm" data-autosubmit>
+        <option value="">All</option>
+        {% for p in ['Critical','High','Medium','Low'] %}
+          <option value="{{ p }}" {{ 'selected' if selected_priority == p }}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label">Max Distance (km)</label>
+      <input type="number" name="max_distance" class="form-control form-control-sm" placeholder="Any" value="{{ max_distance }}">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label">Min Meals</label>
+      <input type="number" name="min_meals" class="form-control form-control-sm" placeholder="Any" value="{{ min_meals }}">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label">Sort By</label>
+      <select name="sort" class="form-select form-select-sm" data-autosubmit>
+        <option value="match" {{ 'selected' if sort_by == 'match' }}>Highest Match</option>
+        <option value="nearest" {{ 'selected' if sort_by == 'nearest' }}>Nearest</option>
+        <option value="urgent" {{ 'selected' if sort_by == 'urgent' }}>Most Urgent</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2 d-grid">
+      <button class="btn btn-fl-primary btn-sm" type="submit"><i class="bi bi-funnel"></i> Apply</button>
+    </div>
+  </form>
+</div>
+
+{% if results %}
+<div class="row g-3">
+  {% for r in results %}
+  <div class="col-md-6 col-xl-4">
+    <div class="donation-card">
+      <div class="donation-card-img">
+        {% if r.donation.image_filename %}
+          <img src="{{ url_for('static', filename='uploads/' ~ r.donation.image_filename) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+        {% else %}
+          <i class="bi bi-egg-fried"></i>
+        {% endif %}
+        <div class="position-absolute top-0 end-0 m-2">{{ m.priority_badge(r.priority) }}</div>
+      </div>
+      <div class="donation-card-body">
+        <div class="d-flex justify-content-between align-items-start mb-1">
+          <h6 class="mb-0">{{ r.donation.food_name }}</h6>
+        </div>
+        <div class="small text-muted-fl mb-2">{{ r.donation.category }} · {{ r.donation.donor.organization_name }}</div>
+        <div class="d-flex flex-wrap gap-3 small mb-2">
+          <span><i class="bi bi-people text-success"></i> {{ r.donation.meal_count }} meals</span>
+          <span><i class="bi bi-geo-alt text-success"></i> {{ r.distance_km }} km</span>
+          <span><i class="bi bi-clock text-danger"></i> <span data-countdown="{{ r.donation.available_until.isoformat() }}">{{ r.donation.time_remaining_display }}</span></span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+          {{ m.match_score_pill(r.score) }}
+          <a href="{{ url_for('recipient.donation_details', donation_id=r.donation.id) }}" class="btn btn-fl-primary btn-sm">View & Claim</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="fl-card empty-state">
+  <i class="bi bi-emoji-frown"></i>
+  <p class="mb-0">No donations match your filters right now. Try widening your search.</p>
+</div>
+{% endif %}
+{% endblock %}

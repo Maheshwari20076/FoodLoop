@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}FoodLoop — Don't let good food become waste{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="hero-badge"><i class="bi bi-stars"></i> HACKDAY 1.0 · Tech for a Better Tomorrow</span>
+        <h1 class="hero-title">Don't let <span class="accent">good food</span> become waste.</h1>
+        <p class="hero-subtitle">FoodLoop connects surplus food with nearby verified recipients before it's too late — using Smart Rescue Matching to get food from kitchen to community, fast.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('auth.register') }}?role=donor" class="btn btn-fl-primary btn-lg px-4"><i class="bi bi-shop"></i> Donate Surplus Food</a>
+          <a href="{{ url_for('auth.register') }}?role=recipient" class="btn btn-fl-outline btn-lg px-4"><i class="bi bi-search"></i> Find Food</a>
+        </div>
+        <div class="d-flex gap-4 mt-4 flex-wrap">
+          <div><span class="fw-bold">{{ stats.donor_count }}+</span> <span class="small text-muted-fl">Donors</span></div>
+          <div><span class="fw-bold">{{ stats.recipient_count }}+</span> <span class="small text-muted-fl">Recipients</span></div>
+          <div><span class="fw-bold">{{ stats.active_donations }}</span> <span class="small text-muted-fl">Live listings</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="match-demo-card ms-lg-auto">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold small text-uppercase" style="letter-spacing:.05em; color:var(--fl-ink-500);">Smart Rescue Match</span>
+            <span class="match-score-pill"><i class="bi bi-stars"></i> 93% Match</span>
+          </div>
+          <div class="badge-fl badge-critical mb-3"><i class="bi bi-fire"></i> High Priority</div>
+          <h5 class="mb-1">Veg Biryani & Curry — 40 meals</h5>
+          <p class="small text-muted-fl mb-3">Green Leaf Restaurant · Koramangala</p>
+          <ul class="list-unstyled small mb-0">
+            <li class="mb-2"><i class="bi bi-geo-alt-fill text-success"></i> 1.8 km away</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Enough capacity</li>
+            <li class="mb-0"><i class="bi bi-clock-fill text-danger"></i> Only 1h 20m remaining</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section-py">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-kicker">The Problem</span>
+      <h2>Good food is going to waste — while people go hungry</h2>
+      <p class="text-muted-fl">Restaurants, canteens, hostels and event caterers regularly end up with surplus, edible food. Without a fast way to connect it to nearby recipients before it expires, it's thrown away instead of rescued.</p>
+    </div>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="fl-card fl-card-pad h-100">
+          <i class="bi bi-hourglass-split fs-2 text-danger"></i>
+          <h5 class="mt-3">Time is the enemy</h5>
+          <p class="small text-muted-fl mb-0">Surplus food has a short safe-to-eat window, and without a fast alert system, it expires before anyone even hears about it.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="fl-card fl-card-pad h-100">
+          <i class="bi bi-signpost-2 fs-2 text-warning"></i>
+          <h5 class="mt-3">No easy way to connect</h5>
+          <p class="small text-muted-fl mb-0">Donors don't know which nearby NGO or shelter can actually use the food right now, and how much they can take.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="fl-card fl-card-pad h-100">
+          <i class="bi bi-clipboard-x fs-2 text-secondary"></i>
+          <h5 class="mt-3">No accountability</h5>
+          <p class="small text-muted-fl mb-0">Without verification or tracking, food donation stays informal, unreliable, and hard to measure.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-py bg-white" id="how-it-works" style="background:#fff;">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-kicker">How It Works</span>
+      <h2>From surplus to plate, in three steps</h2>
+      <p class="text-muted-fl">FoodLoop's core rescue flow is built to move fast — because every minute counts.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <h5>Donor Lists Surplus Food</h5>
+          <p class="small text-muted-fl">A restaurant, canteen or caterer creates a donation with quantity, meal count, and pickup deadline.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <h5>Smart Rescue Matching</h5>
+          <p class="small text-muted-fl">Our algorithm instantly scores nearby verified recipients on urgency, distance, capacity and suitability.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <h5>Claim & Confirm Pickup</h5>
+          <p class="small text-muted-fl">The best-fit recipient claims it, gets a 6-digit pickup code, and confirms once the handoff happens.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SMART MATCHING -->
+<section class="section-py" id="matching">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="section-kicker">Core Innovation</span>
+        <h2>Smart Rescue Matching</h2>
+        <p class="text-muted-fl mb-4">Every donation gets a Match Score from 0–100, computed instantly with a transparent, rule-based algorithm — no external AI needed.</p>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small fw-semibold mb-1"><span>⏱ Urgency / Time Remaining</span><span>40%</span></div>
+          <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:40%"></div></div>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small fw-semibold mb-1"><span>📍 Distance</span><span>30%</span></div>
+          <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:30%"></div></div>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small fw-semibold mb-1"><span>⚖️ Quantity Compatibility</span><span>20%</span></div>
+          <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:20%"></div></div>
+        </div>
+        <div class="mb-1">
+          <div class="d-flex justify-content-between small fw-semibold mb-1"><span>✅ Recipient Suitability</span><span>10%</span></div>
+          <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:10%"></div></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="match-demo-card mx-auto">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold small text-uppercase" style="letter-spacing:.05em; color:var(--fl-ink-500);">Example Recommendation</span>
+          </div>
+          <div class="text-center mb-3">
+            <span class="match-score-pill" style="font-size:1.2rem; padding:0.5rem 1.1rem;"><i class="bi bi-stars"></i> 93% Match</span>
+          </div>
+          <div class="badge-fl badge-critical d-block text-center mb-3" style="display:inline-block;"><i class="bi bi-fire"></i> High Priority</div>
+          <ul class="list-unstyled small mb-0">
+            <li class="mb-2 d-flex justify-content-between"><span><i class="bi bi-geo-alt-fill text-success"></i> Distance</span><span class="fw-semibold">1.8 km away</span></li>
+            <li class="mb-2 d-flex justify-content-between"><span><i class="bi bi-box-seam text-success"></i> Capacity</span><span class="fw-semibold">Enough capacity</span></li>
+            <li class="mb-0 d-flex justify-content-between"><span><i class="bi bi-clock-fill text-danger"></i> Time Left</span><span class="fw-semibold">Only 1h 20m remaining</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT STATS -->
+<section class="section-py" id="impact" style="background:#fff;">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-kicker">Live Impact</span>
+      <h2>Real numbers, rescued in real time</h2>
+      <p class="text-muted-fl">Environmental figures are estimated using standard food-weight and emissions averages.</p>
+    </div>
+    <div class="row g-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card justify-content-center flex-column text-center">
+          <div class="stat-icon bg-soft-green mb-2"><i class="bi bi-cup-hot"></i></div>
+          <div class="stat-value">{{ stats.meals_rescued }}</div>
+          <div class="stat-label">🍱 Meals Rescued</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card justify-content-center flex-column text-center">
+          <div class="stat-icon bg-soft-blue mb-2"><i class="bi bi-recycle"></i></div>
+          <div class="stat-value">{{ stats.food_saved_kg }} kg</div>
+          <div class="stat-label">♻️ Food Saved</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card justify-content-center flex-column text-center">
+          <div class="stat-icon bg-soft-amber mb-2"><i class="bi bi-cloud-sun"></i></div>
+          <div class="stat-value">{{ stats.co2e_avoided_kg }} kg</div>
+          <div class="stat-label">🌱 CO₂e Avoided (est.)</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card justify-content-center flex-column text-center">
+          <div class="stat-icon bg-soft-green mb-2"><i class="bi bi-people"></i></div>
+          <div class="stat-value">{{ stats.successful_connections }}</div>
+          <div class="stat-label">🤝 Successful Connections</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USER TYPES -->
+<section class="section-py">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-kicker">Who It's For</span>
+      <h2>Built for everyone in the food rescue chain</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="user-type-card">
+          <div class="user-type-icon bg-soft-green"><i class="bi bi-shop"></i></div>
+          <h5>Donors</h5>
+          <p class="small text-muted-fl">Restaurants, college canteens, hostels, caterers & event organizers list surplus food in minutes.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="user-type-card">
+          <div class="user-type-icon bg-soft-blue"><i class="bi bi-house-heart"></i></div>
+          <h5>Recipients</h5>
+          <p class="small text-muted-fl">Verified NGOs, shelters & community kitchens discover, claim, and pick up food nearby.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="user-type-card">
+          <div class="user-type-icon bg-soft-amber"><i class="bi bi-shield-check"></i></div>
+          <h5>Admins</h5>
+          <p class="small text-muted-fl">Verify organizations, monitor donations & claims, and keep the platform trustworthy.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="pb-5">
+  <div class="container">
+    <div class="cta-section" style="max-width: 900px;">
+      <h2 class="mb-2">Ready to rescue food instead of wasting it?</h2>
+      <p class="mb-4">Join FoodLoop today — it takes less than two minutes to get started.</p>
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{{ url_for('auth.register') }}?role=donor" class="btn btn-light btn-lg px-4"><i class="bi bi-shop"></i> Donate Surplus Food</a>
+        <a href="{{ url_for('auth.register') }}?role=recipient" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-search"></i> Find Food</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

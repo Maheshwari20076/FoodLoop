@@ -1,0 +1,63 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Pickup Code{% endblock %}
+{% block sidebar_links %}{% include "recipient/_sidebar.html" %}{% endblock %}
+{% block page_title %}Donation Claimed Successfully{% endblock %}
+{% block page_subtitle %}Show this code to the donor at pickup.{% endblock %}
+
+{% block dash_content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <div class="fl-card fl-card-pad text-center mb-4">
+      <i class="bi bi-check-circle-fill text-success" style="font-size:2.6rem;"></i>
+      <h4 class="mt-2 mb-1">Donation Claimed Successfully!</h4>
+      <p class="text-muted-fl mb-0">{{ donation.food_name }} from {{ donation.donor.organization_name }}</p>
+    </div>
+
+    <div class="pickup-code-box mb-4">
+      <div class="small text-uppercase mb-2" style="letter-spacing:0.1em; opacity:0.8;">Your Pickup Code</div>
+      <div class="pickup-code-digits">{{ claim.pickup_code }}</div>
+      <button class="btn btn-light btn-sm mt-3" data-copy="{{ claim.pickup_code }}"><i class="bi bi-clipboard"></i> Copy Code</button>
+    </div>
+
+    <div class="fl-card fl-card-pad mb-4">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="small text-muted-fl">Pickup Location</div>
+          <div class="fw-semibold"><i class="bi bi-geo-alt text-success"></i> {{ donation.pickup_location }}</div>
+          <div class="small text-muted-fl">{{ donation.area }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted-fl">Pickup By</div>
+          <div class="fw-semibold"><i class="bi bi-clock text-danger"></i>
+            {% if claim.status == 'CLAIMED' %}
+              <span data-countdown="{{ donation.available_until.isoformat() }}">{{ donation.time_remaining_display }}</span> remaining
+            {% else %}
+              {{ donation.available_until.strftime('%d %b, %H:%M') }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted-fl">Meals</div>
+          <div class="fw-semibold">{{ donation.meal_count }} meals ({{ donation.quantity }} {{ donation.quantity_unit }})</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted-fl">Status</div>
+          <div>{{ m.status_badge(claim.status) }}</div>
+        </div>
+      </div>
+    </div>
+
+    {% if claim.status == 'CLAIMED' %}
+    <form method="POST" action="{{ url_for('recipient.confirm_pickup', claim_id=claim.id) }}" data-confirm="Confirm that you've picked up this food?">
+      <button type="submit" class="btn btn-fl-primary w-100 py-2"><i class="bi bi-check2-circle"></i> Confirm Pickup</button>
+    </form>
+    <p class="small text-muted-fl text-center mt-2 mb-0">Only confirm once you have physically collected the food.</p>
+    {% else %}
+    <div class="alert alert-success text-center mb-0"><i class="bi bi-check2-circle"></i> Pickup confirmed on {{ claim.picked_up_at.strftime('%d %b, %H:%M') }}. Thank you for rescuing this food!</div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

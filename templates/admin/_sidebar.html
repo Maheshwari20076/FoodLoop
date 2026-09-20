@@ -1,0 +1,12 @@
+<a class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">
+  <i class="bi bi-grid-1x2"></i> Dashboard
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'admin.users' }}" href="{{ url_for('admin.users') }}">
+  <i class="bi bi-people"></i> Users
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'admin.donations' }}" href="{{ url_for('admin.donations') }}">
+  <i class="bi bi-box-seam"></i> Donations
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'admin.claims' }}" href="{{ url_for('admin.claims') }}">
+  <i class="bi bi-bag-check"></i> Claims
+</a>

@@ -1,0 +1,104 @@
+{% extends "dash_layout.html" %}
+{% block title %}Create Donation{% endblock %}
+{% block sidebar_links %}{% include "donor/_sidebar.html" %}{% endblock %}
+{% block page_title %}Create a Donation{% endblock %}
+{% block page_subtitle %}List surplus food so Smart Rescue Matching can find it a home fast.{% endblock %}
+
+{% block dash_content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="fl-form-card">
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Food Name *</label>
+            <input type="text" name="food_name" class="form-control" placeholder="e.g. Veg Pulao & Curry (40 servings)" value="{{ form.get('food_name','') }}" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Category *</label>
+            <select name="category" class="form-select" required>
+              <option value="" disabled {{ 'selected' if not form.get('category') }}>Choose...</option>
+              {% for c in categories %}
+                <option value="{{ c }}" {{ 'selected' if form.get('category') == c }}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Ingredients, allergens, packaging details, etc.">{{ form.get('description','') }}</textarea>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Quantity *</label>
+            <input type="number" step="0.1" min="0.1" name="quantity" class="form-control" placeholder="e.g. 12" value="{{ form.get('quantity','') }}" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Unit *</label>
+            <select name="quantity_unit" class="form-select" required>
+              {% for u in units %}
+                <option value="{{ u }}" {{ 'selected' if form.get('quantity_unit', 'kg') == u }}>{{ u }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Meal Count (approx.) *</label>
+            <input type="number" min="1" name="meal_count" class="form-control" placeholder="e.g. 40" value="{{ form.get('meal_count','') }}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Food Condition *</label>
+            <select name="food_condition" class="form-select" required>
+              {% for c in conditions %}
+                <option value="{{ c }}" {{ 'selected' if form.get('food_condition','Fresh') == c }}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Available Until (pickup deadline) *</label>
+            <input type="datetime-local" name="available_until" class="form-control" value="{{ form.get('available_until','') }}" required>
+          </div>
+
+          <div class="col-md-7">
+            <label class="form-label">Pickup Location / Address *</label>
+            <input type="text" name="pickup_location" class="form-control" placeholder="e.g. Green Leaf Restaurant, 12th Main Rd" value="{{ form.get('pickup_location','') }}" required>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Area *</label>
+            <select name="area" class="form-select" required>
+              {% for a in areas %}
+                <option value="{{ a }}" {{ 'selected' if (form.get('area', current_user.area)) == a }}>{{ a }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Used for distance-based Smart Matching.</div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Photo (optional)</label>
+            <input type="file" id="image" name="image" accept="image/*" class="form-control">
+            <img id="imagePreview" src="" alt="" class="d-none mt-2 rounded" style="max-height:160px;">
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <p class="small text-muted-fl mb-0"><i class="bi bi-cpu"></i> On submit, Smart Rescue Matching will score verified recipients instantly.</p>
+          <button type="submit" class="btn btn-fl-primary px-4"><i class="bi bi-send-check"></i> Publish Donation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="fl-card fl-card-pad">
+      <h6 class="fw-bold mb-3"><i class="bi bi-lightbulb text-warning"></i> Tips for a great listing</h6>
+      <ul class="small text-muted-fl ps-3 mb-0">
+        <li class="mb-2">Be specific about meal count — this drives recipient capacity matching.</li>
+        <li class="mb-2">Set a realistic pickup deadline; urgency is 40% of the match score.</li>
+        <li class="mb-2">Choose the closest "Area" for accurate distance-based matching.</li>
+        <li>Add a photo — listings with photos get claimed faster.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

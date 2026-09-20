@@ -1,0 +1,12 @@
+<a class="nav-link {{ 'active' if request.endpoint == 'donor.dashboard' }}" href="{{ url_for('donor.dashboard') }}">
+  <i class="bi bi-grid-1x2"></i> Dashboard
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'donor.create_donation' }}" href="{{ url_for('donor.create_donation') }}">
+  <i class="bi bi-plus-circle"></i> Create Donation
+</a>
+<a class="nav-link {{ 'active' if request.endpoint in ['donor.my_donations','donor.donation_details'] }}" href="{{ url_for('donor.my_donations') }}">
+  <i class="bi bi-box-seam"></i> My Donations
+</a>
+<a class="nav-link {{ 'active' if request.endpoint == 'donor.impact' }}" href="{{ url_for('donor.impact') }}">
+  <i class="bi bi-bar-chart-line"></i> Impact
+</a>

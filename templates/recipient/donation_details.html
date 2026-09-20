@@ -1,0 +1,97 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ donation.food_name }}{% endblock %}
+{% block sidebar_links %}{% include "recipient/_sidebar.html" %}{% endblock %}
+{% block page_title %}{{ donation.food_name }}{% endblock %}
+{% block page_subtitle %}Donated by {{ donation.donor.organization_name }}{% endblock %}
+{% block page_actions %}{{ m.status_badge(donation.status) }}{% endblock %}
+
+{% block dash_content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="fl-card fl-card-pad">
+      {% if donation.image_filename %}
+        <img src="{{ url_for('static', filename='uploads/' ~ donation.image_filename) }}" class="rounded mb-3 w-100" style="max-height:260px; object-fit:cover;" alt="{{ donation.food_name }}">
+      {% endif %}
+      <div class="row g-3 mb-2">
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Quantity</div>
+          <div class="fw-bold">{{ donation.quantity }} {{ donation.quantity_unit }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Meal Count</div>
+          <div class="fw-bold">{{ donation.meal_count }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Condition</div>
+          <div class="fw-bold">{{ donation.food_condition }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Priority</div>
+          <div>{{ m.priority_badge(match.priority) }}</div>
+        </div>
+      </div>
+      {% if donation.description %}<p class="mt-2">{{ donation.description }}</p>{% endif %}
+      <hr>
+      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+        <div><i class="bi bi-geo-alt text-success"></i> {{ donation.pickup_location }} ({{ donation.area }})</div>
+        <div>
+          {% if donation.status == 'AVAILABLE' %}
+            <i class="bi bi-clock text-danger"></i> <span data-countdown="{{ donation.available_until.isoformat() }}">{{ donation.time_remaining_display }}</span> remaining
+          {% else %}
+            <i class="bi bi-clock"></i> Deadline was {{ donation.available_until.strftime('%d %b, %H:%M') }}
+          {% endif %}
+        </div>
+      </div>
+
+      {% if my_claim %}
+        <a href="{{ url_for('recipient.claim_confirmation', claim_id=my_claim.id) }}" class="btn btn-fl-primary w-100"><i class="bi bi-qr-code"></i> View Your Pickup Code</a>
+      {% elif donation.status == 'AVAILABLE' and not donation.is_expired %}
+        <form method="POST" action="{{ url_for('recipient.claim_donation', donation_id=donation.id) }}" data-confirm="Claim this donation? You'll receive a pickup code.">
+          <button type="submit" class="btn btn-fl-primary w-100"><i class="bi bi-hand-index-thumb"></i> Claim This Donation</button>
+        </form>
+      {% else %}
+        <button class="btn btn-secondary w-100" disabled>No longer available</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="fl-card fl-card-pad mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-cpu text-success"></i> Your Match Score</h5>
+        {{ m.match_score_pill(match.score) }}
+      </div>
+      <p class="small text-muted-fl mb-3">{{ match.reason }}</p>
+
+      <div class="mb-2">
+        <div class="d-flex justify-content-between small mb-1"><span>Urgency (40%)</span><span>{{ match.breakdown.urgency }}/40</span></div>
+        <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:{{ (match.breakdown.urgency/40*100)|round }}%"></div></div>
+      </div>
+      <div class="mb-2">
+        <div class="d-flex justify-content-between small mb-1"><span>Distance (30%)</span><span>{{ match.breakdown.distance }}/30</span></div>
+        <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:{{ (match.breakdown.distance/30*100)|round }}%"></div></div>
+      </div>
+      <div class="mb-2">
+        <div class="d-flex justify-content-between small mb-1"><span>Quantity Fit (20%)</span><span>{{ match.breakdown.quantity }}/20</span></div>
+        <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:{{ (match.breakdown.quantity/20*100)|round }}%"></div></div>
+      </div>
+      <div class="mb-1">
+        <div class="d-flex justify-content-between small mb-1"><span>Suitability (10%)</span><span>{{ match.breakdown.suitability }}/10</span></div>
+        <div class="progress progress-thin"><div class="progress-bar bg-success" style="width:{{ (match.breakdown.suitability/10*100)|round }}%"></div></div>
+      </div>
+    </div>
+
+    <div class="fl-card fl-card-pad">
+      <h6 class="fw-bold mb-2"><i class="bi bi-shop"></i> Donor</h6>
+      <div class="d-flex align-items-center gap-2">
+        <span class="avatar-circle">{{ donation.donor.name[0]|upper }}</span>
+        <div>
+          <div class="fw-semibold">{{ donation.donor.organization_name }}</div>
+          <div class="small text-muted-fl">{{ donation.donor.area }}{% if donation.donor.is_verified %} · <i class="bi bi-patch-check-fill text-success"></i> Verified{% endif %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

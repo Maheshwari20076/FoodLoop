@@ -1,0 +1,123 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ donation.food_name }}{% endblock %}
+{% block sidebar_links %}{% include "donor/_sidebar.html" %}{% endblock %}
+{% block page_title %}{{ donation.food_name }}{% endblock %}
+{% block page_subtitle %}{{ donation.category }} · Created {{ donation.created_at.strftime('%d %b %Y, %H:%M') }}{% endblock %}
+{% block page_actions %}
+  {{ m.status_badge(donation.status) }}
+{% endblock %}
+
+{% block dash_content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="fl-card fl-card-pad mb-4">
+      {% if donation.image_filename %}
+        <img src="{{ url_for('static', filename='uploads/' ~ donation.image_filename) }}" class="rounded mb-3 w-100" style="max-height:260px; object-fit:cover;" alt="{{ donation.food_name }}">
+      {% endif %}
+      <div class="row g-3 mb-2">
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Quantity</div>
+          <div class="fw-bold">{{ donation.quantity }} {{ donation.quantity_unit }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Meal Count</div>
+          <div class="fw-bold">{{ donation.meal_count }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Condition</div>
+          <div class="fw-bold">{{ donation.food_condition }}</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="small text-muted-fl">Priority</div>
+          <div>{{ m.priority_badge(donation.priority) }}</div>
+        </div>
+      </div>
+      {% if donation.description %}
+        <p class="mt-3 mb-2">{{ donation.description }}</p>
+      {% endif %}
+      <hr>
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div><i class="bi bi-geo-alt text-success"></i> {{ donation.pickup_location }} ({{ donation.area }})</div>
+        <div>
+          {% if donation.status == 'AVAILABLE' %}
+            <i class="bi bi-clock text-danger"></i> <span data-countdown="{{ donation.available_until.isoformat() }}">{{ donation.time_remaining_display }}</span> remaining
+          {% else %}
+            <i class="bi bi-clock"></i> Was available until {{ donation.available_until.strftime('%d %b, %H:%M') }}
+          {% endif %}
+        </div>
+      </div>
+
+      {% if donation.status == 'AVAILABLE' %}
+      <form method="POST" action="{{ url_for('donor.cancel_donation', donation_id=donation.id) }}" class="mt-3" data-confirm="Cancel this donation listing?">
+        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> Cancel Donation</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if donation.claim %}
+    <div class="fl-card fl-card-pad">
+      <h5 class="mb-3"><i class="bi bi-hand-index-thumb text-primary"></i> Claim Details</h5>
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <span class="avatar-circle">{{ donation.claim.recipient.name[0]|upper }}</span>
+        <div>
+          <div class="fw-semibold">{{ donation.claim.recipient.organization_name }}</div>
+          <div class="small text-muted-fl">{{ donation.claim.recipient.recipient_type }} · {{ donation.claim.recipient.area }}</div>
+        </div>
+        <div class="ms-auto">{{ m.status_badge(donation.claim.status) }}</div>
+      </div>
+      <div class="row g-3 mt-1">
+        <div class="col-6 col-md-4">
+          <div class="small text-muted-fl">Pickup Code</div>
+          <div class="fw-bold fs-5 font-monospace">{{ donation.claim.pickup_code }}</div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="small text-muted-fl">Claimed At</div>
+          <div class="fw-bold">{{ donation.claim.claimed_at.strftime('%d %b, %H:%M') }}</div>
+        </div>
+        {% if donation.claim.picked_up_at %}
+        <div class="col-6 col-md-4">
+          <div class="small text-muted-fl">Picked Up At</div>
+          <div class="fw-bold">{{ donation.claim.picked_up_at.strftime('%d %b, %H:%M') }}</div>
+        </div>
+        {% endif %}
+      </div>
+      <p class="small text-muted-fl mt-3 mb-0"><i class="bi bi-info-circle"></i> Ask the recipient for this 6-digit code at handoff to confirm their identity.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-5">
+    <div class="fl-card fl-card-pad">
+      <h5 class="mb-1"><i class="bi bi-cpu text-success"></i> Smart Rescue Matching</h5>
+      <p class="small text-muted-fl">Top recommended recipients for this donation, ranked by match score.</p>
+
+      {% if donation.status != 'AVAILABLE' %}
+        <div class="empty-state py-4">
+          <i class="bi bi-check2-circle"></i>
+          <p class="mb-0">This donation is no longer available for matching.</p>
+        </div>
+      {% elif recommendations %}
+        {% for r in recommendations %}
+        <div class="border rounded-3 p-3 mb-2" style="border-color: var(--fl-border) !important;">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div class="fw-semibold">{{ r.recipient.organization_name }}</div>
+              <div class="small text-muted-fl">{{ r.recipient.recipient_type }} {% if r.recipient.is_verified %}· <i class="bi bi-patch-check-fill text-success"></i> Verified{% endif %}</div>
+            </div>
+            {{ m.match_score_pill(r.score) }}
+          </div>
+          <div class="small mb-2">{{ m.priority_badge(r.priority) }}</div>
+          <div class="small text-muted-fl">{{ r.reason }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state py-4">
+          <i class="bi bi-emoji-neutral"></i>
+          <p class="mb-0">No verified recipients found yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

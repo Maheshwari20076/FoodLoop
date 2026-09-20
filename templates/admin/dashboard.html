@@ -1,0 +1,113 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block sidebar_links %}{% include "admin/_sidebar.html" %}{% endblock %}
+{% block page_title %}Platform Overview{% endblock %}
+{% block page_subtitle %}FoodLoop admin control panel{% endblock %}
+
+{% block dash_content %}
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-people"></i></div>
+      <div><div class="stat-value">{{ total_users }}</div><div class="stat-label">Total Users</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-amber"><i class="bi bi-patch-exclamation"></i></div>
+      <div><div class="stat-value">{{ pending_verifications }}</div><div class="stat-label">Pending Verifications</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-blue"><i class="bi bi-box-seam"></i></div>
+      <div><div class="stat-value">{{ total_donations }}</div><div class="stat-label">Total Donations</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-cup-hot"></i></div>
+      <div><div class="stat-value">{{ total_meals }}</div><div class="stat-label">Meals Rescued</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-broadcast"></i></div>
+      <div><div class="stat-value">{{ active_donations }}</div><div class="stat-label">Available</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-blue"><i class="bi bi-hand-index-thumb"></i></div>
+      <div><div class="stat-value">{{ claimed_donations }}</div><div class="stat-label">Claimed</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-check2-circle"></i></div>
+      <div><div class="stat-value">{{ picked_up_donations }}</div><div class="stat-label">Picked Up</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-red"><i class="bi bi-clock-history"></i></div>
+      <div><div class="stat-value">{{ expired_donations }}</div><div class="stat-label">Expired</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="fl-card">
+      <div class="fl-card-pad pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Donations</h5>
+        <a href="{{ url_for('admin.donations') }}" class="small">View all <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-fl mb-0">
+          <thead><tr><th>Food</th><th>Donor</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for d in recent_donations %}
+            <tr>
+              <td class="fw-semibold small">{{ d.food_name }}</td>
+              <td class="small">{{ d.donor.organization_name }}</td>
+              <td>{{ m.status_badge(d.status) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-muted-fl py-3">No donations yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="fl-card">
+      <div class="fl-card-pad pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Users</h5>
+        <a href="{{ url_for('admin.users') }}" class="small">View all <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-fl mb-0">
+          <thead><tr><th>Name</th><th>Role</th><th>Verified</th></tr></thead>
+          <tbody>
+            {% for u in recent_users %}
+            <tr>
+              <td class="fw-semibold small">{{ u.organization_name or u.name }}</td>
+              <td class="small text-capitalize">{{ u.role }}</td>
+              <td>{% if u.is_verified %}<span class="text-success"><i class="bi bi-patch-check-fill"></i></span>{% else %}<span class="text-muted-fl"><i class="bi bi-dash-circle"></i></span>{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-muted-fl py-3">No users yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

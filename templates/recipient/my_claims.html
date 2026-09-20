@@ -1,0 +1,49 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}My Claims{% endblock %}
+{% block sidebar_links %}{% include "recipient/_sidebar.html" %}{% endblock %}
+{% block page_title %}My Claims{% endblock %}
+{% block page_subtitle %}{{ claims|length }} claim(s){% endblock %}
+
+{% block dash_content %}
+<div class="fl-card fl-card-pad mb-3 py-2">
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('recipient.my_claims') }}" class="btn btn-sm {{ 'btn-fl-primary' if not status_filter else 'btn-fl-outline' }}">All</a>
+    {% for s in ['CLAIMED','PICKED_UP'] %}
+      <a href="{{ url_for('recipient.my_claims', status=s) }}" class="btn btn-sm {{ 'btn-fl-primary' if status_filter == s else 'btn-fl-outline' }}">{{ s.replace('_',' ')|title }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if claims %}
+<div class="row g-3">
+  {% for c in claims %}
+  <div class="col-md-6">
+    <div class="fl-card fl-card-pad">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="mb-0">{{ c.donation.food_name }}</h6>
+          <div class="small text-muted-fl">{{ c.donation.donor.organization_name }}</div>
+        </div>
+        {{ m.status_badge(c.status) }}
+      </div>
+      <div class="small text-muted-fl mb-2">
+        <i class="bi bi-people"></i> {{ c.donation.meal_count }} meals ·
+        <i class="bi bi-geo-alt"></i> {{ c.distance_km }} km ·
+        Claimed {{ c.claimed_at.strftime('%d %b, %H:%M') }}
+      </div>
+      <a href="{{ url_for('recipient.claim_confirmation', claim_id=c.id) }}" class="btn btn-fl-outline btn-sm w-100">
+        {% if c.status == 'CLAIMED' %}<i class="bi bi-qr-code"></i> View Pickup Code{% else %}<i class="bi bi-eye"></i> View Details{% endif %}
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="fl-card empty-state">
+  <i class="bi bi-bag"></i>
+  <p class="mb-3">You haven't claimed any donations yet.</p>
+  <a href="{{ url_for('recipient.find_food') }}" class="btn btn-fl-primary btn-sm">Find Food Now</a>
+</div>
+{% endif %}
+{% endblock %}

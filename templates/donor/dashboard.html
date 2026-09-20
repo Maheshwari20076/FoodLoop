@@ -1,0 +1,90 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Donor Dashboard{% endblock %}
+{% block sidebar_links %}{% include "donor/_sidebar.html" %}{% endblock %}
+{% block page_title %}Welcome back, {{ current_user.name.split(' ')[0] }} 👋{% endblock %}
+{% block page_subtitle %}{{ current_user.organization_name }} · Donor Dashboard{% endblock %}
+{% block page_actions %}
+  <a href="{{ url_for('donor.create_donation') }}" class="btn btn-fl-primary"><i class="bi bi-plus-lg"></i> New Donation</a>
+{% endblock %}
+
+{% block dash_content %}
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-box-seam"></i></div>
+      <div><div class="stat-value">{{ active_count }}</div><div class="stat-label">Active Donations</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-blue"><i class="bi bi-cup-hot"></i></div>
+      <div><div class="stat-value">{{ meals_rescued }}</div><div class="stat-label">Meals Rescued</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-amber"><i class="bi bi-basket"></i></div>
+      <div><div class="stat-value">{{ food_saved_kg }} kg</div><div class="stat-label">Food Saved</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-patch-check"></i></div>
+      <div><div class="stat-value">{{ pickups_count }}</div><div class="stat-label">Successful Pickups</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="fl-card">
+  <div class="fl-card-pad pb-2 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Recent Donations</h5>
+    <a href="{{ url_for('donor.my_donations') }}" class="small">View all <i class="bi bi-arrow-right"></i></a>
+  </div>
+  {% if donations %}
+  <div class="table-responsive">
+    <table class="table table-fl mb-0">
+      <thead>
+        <tr>
+          <th>Food</th><th>Qty</th><th>Meals</th><th>Time Left</th><th>Priority</th><th>Status</th><th>Recommended Recipient</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in donations %}
+        <tr>
+          <td class="fw-semibold">{{ d.food_name }}</td>
+          <td>{{ d.quantity }} {{ d.quantity_unit }}</td>
+          <td>{{ d.meal_count }}</td>
+          <td>
+            {% if d.status == 'AVAILABLE' %}
+              <span data-countdown="{{ d.available_until.isoformat() }}">{{ d.time_remaining_display }}</span>
+            {% else %}
+              <span class="text-muted-fl">—</span>
+            {% endif %}
+          </td>
+          <td>{{ m.priority_badge(d.priority) }}</td>
+          <td>{{ m.status_badge(d.status) }}</td>
+          <td>
+            {% if d.best_match_recipient %}
+              <span class="small">{{ d.best_match_recipient.organization_name }}</span>
+            {% else %}
+              <span class="text-muted-fl small">No match yet</span>
+            {% endif %}
+          </td>
+          <td><a href="{{ url_for('donor.donation_details', donation_id=d.id) }}" class="btn btn-sm btn-fl-outline">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-basket2"></i>
+    <p class="mb-3">You haven't created any donations yet.</p>
+    <a href="{{ url_for('donor.create_donation') }}" class="btn btn-fl-primary btn-sm">Create your first donation</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

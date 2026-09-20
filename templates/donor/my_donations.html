@@ -1,0 +1,51 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}My Donations{% endblock %}
+{% block sidebar_links %}{% include "donor/_sidebar.html" %}{% endblock %}
+{% block page_title %}My Donations{% endblock %}
+{% block page_subtitle %}{{ donations|length }} donation(s){% endblock %}
+{% block page_actions %}
+  <a href="{{ url_for('donor.create_donation') }}" class="btn btn-fl-primary"><i class="bi bi-plus-lg"></i> New Donation</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="fl-card fl-card-pad mb-3 py-2">
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('donor.my_donations') }}" class="btn btn-sm {{ 'btn-fl-primary' if not status_filter else 'btn-fl-outline' }}">All</a>
+    {% for s in ['AVAILABLE','CLAIMED','PICKED_UP','EXPIRED','CANCELLED'] %}
+      <a href="{{ url_for('donor.my_donations', status=s) }}" class="btn btn-sm {{ 'btn-fl-primary' if status_filter == s else 'btn-fl-outline' }}">{{ s.replace('_',' ')|title }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if donations %}
+<div class="fl-card">
+  <div class="table-responsive">
+    <table class="table table-fl mb-0">
+      <thead>
+        <tr><th>Food</th><th>Qty</th><th>Meals</th><th>Time Left</th><th>Priority</th><th>Status</th><th>Recommended Recipient</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for d in donations %}
+        <tr>
+          <td class="fw-semibold">{{ d.food_name }}<div class="small text-muted-fl">{{ d.category }}</div></td>
+          <td>{{ d.quantity }} {{ d.quantity_unit }}</td>
+          <td>{{ d.meal_count }}</td>
+          <td>{% if d.status == 'AVAILABLE' %}<span data-countdown="{{ d.available_until.isoformat() }}">{{ d.time_remaining_display }}</span>{% else %}—{% endif %}</td>
+          <td>{{ m.priority_badge(d.priority) }}</td>
+          <td>{{ m.status_badge(d.status) }}</td>
+          <td>{% if d.best_match_recipient %}<span class="small">{{ d.best_match_recipient.organization_name }}</span>{% else %}<span class="text-muted-fl small">—</span>{% endif %}</td>
+          <td><a href="{{ url_for('donor.donation_details', donation_id=d.id) }}" class="btn btn-sm btn-fl-outline">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="fl-card empty-state">
+  <i class="bi bi-inbox"></i>
+  <p>No donations match this filter.</p>
+</div>
+{% endif %}
+{% endblock %}

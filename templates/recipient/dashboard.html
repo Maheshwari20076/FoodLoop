@@ -1,0 +1,82 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Recipient Dashboard{% endblock %}
+{% block sidebar_links %}{% include "recipient/_sidebar.html" %}{% endblock %}
+{% block page_title %}Welcome back, {{ current_user.name.split(' ')[0] }} 👋{% endblock %}
+{% block page_subtitle %}{{ current_user.organization_name }} · Recipient Dashboard{% endblock %}
+{% block page_actions %}
+  <a href="{{ url_for('recipient.find_food') }}" class="btn btn-fl-primary"><i class="bi bi-search"></i> Find Food</a>
+{% endblock %}
+
+{% block dash_content %}
+{% if not current_user.is_verified %}
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
+  <i class="bi bi-hourglass-split"></i> Your organization is pending admin verification. You can still browse and claim food while you wait.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-blue"><i class="bi bi-hand-index-thumb"></i></div>
+      <div><div class="stat-value">{{ active_claims_count }}</div><div class="stat-label">Active Claims</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-cup-hot"></i></div>
+      <div><div class="stat-value">{{ meals_received }}</div><div class="stat-label">Meals Received</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-amber"><i class="bi bi-basket"></i></div>
+      <div><div class="stat-value">{{ food_received_kg }} kg</div><div class="stat-label">Food Received</div></div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-soft-green"><i class="bi bi-patch-check"></i></div>
+      <div><div class="stat-value">{{ completed_claims_count }}</div><div class="stat-label">Completed Pickups</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="fl-card">
+  <div class="fl-card-pad pb-2 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Top Matches Near You</h5>
+    <a href="{{ url_for('recipient.find_food') }}" class="small">See all <i class="bi bi-arrow-right"></i></a>
+  </div>
+  {% if top_matches %}
+  <div class="row g-3 p-3 pt-1">
+    {% for r in top_matches %}
+    <div class="col-md-6 col-xl-4">
+      <div class="donation-card">
+        <div class="donation-card-img">
+          {% if r.donation.image_filename %}
+            <img src="{{ url_for('static', filename='uploads/' ~ r.donation.image_filename) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+          {% else %}
+            <i class="bi bi-egg-fried"></i>
+          {% endif %}
+        </div>
+        <div class="donation-card-body">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h6 class="mb-0">{{ r.donation.food_name }}</h6>
+            {{ m.match_score_pill(r.score) }}
+          </div>
+          <div class="small text-muted-fl mb-2">{{ r.donation.meal_count }} meals · {{ r.distance_km }} km · <span data-countdown="{{ r.donation.available_until.isoformat() }}">{{ r.donation.time_remaining_display }}</span></div>
+          {{ m.priority_badge(r.priority) }}
+          <a href="{{ url_for('recipient.donation_details', donation_id=r.donation.id) }}" class="btn btn-fl-primary btn-sm w-100 mt-3">View & Claim</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-search"></i>
+    <p class="mb-0">No available donations right now. Check back soon!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

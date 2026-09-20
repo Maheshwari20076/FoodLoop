@@ -1,0 +1,41 @@
+{% extends "dash_layout.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Manage Claims{% endblock %}
+{% block sidebar_links %}{% include "admin/_sidebar.html" %}{% endblock %}
+{% block page_title %}Claims{% endblock %}
+{% block page_subtitle %}{{ claims|length }} claim(s){% endblock %}
+
+{% block dash_content %}
+<div class="fl-card fl-card-pad mb-3 py-2">
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('admin.claims') }}" class="btn btn-sm {{ 'btn-fl-primary' if not status_filter else 'btn-fl-outline' }}">All</a>
+    {% for s in ['CLAIMED','PICKED_UP'] %}
+      <a href="{{ url_for('admin.claims', status=s) }}" class="btn btn-sm {{ 'btn-fl-primary' if status_filter == s else 'btn-fl-outline' }}">{{ s.replace('_',' ')|title }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="fl-card">
+  <div class="table-responsive">
+    <table class="table table-fl mb-0">
+      <thead>
+        <tr><th>Donation</th><th>Recipient</th><th>Match</th><th>Pickup Code</th><th>Status</th><th>Claimed At</th></tr>
+      </thead>
+      <tbody>
+        {% for c in claims %}
+        <tr>
+          <td class="fw-semibold small">{{ c.donation.food_name }}<div class="text-muted-fl">{{ c.donation.donor.organization_name }}</div></td>
+          <td class="small">{{ c.recipient.organization_name }}</td>
+          <td>{{ c.match_score|round|int if c.match_score else '—' }}%</td>
+          <td class="font-monospace">{{ c.pickup_code }}</td>
+          <td>{{ m.status_badge(c.status) }}</td>
+          <td class="small">{{ c.claimed_at.strftime('%d %b, %H:%M') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted-fl py-4">No claims found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

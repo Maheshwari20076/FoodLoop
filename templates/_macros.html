@@ -1,0 +1,35 @@
+{% macro priority_badge(priority) %}
+  {% if priority == 'Critical' %}
+    <span class="badge-fl badge-critical"><i class="bi bi-fire"></i> Critical</span>
+  {% elif priority == 'High' %}
+    <span class="badge-fl badge-high"><i class="bi bi-exclamation-triangle"></i> High</span>
+  {% elif priority == 'Medium' %}
+    <span class="badge-fl badge-medium"><i class="bi bi-dot"></i> Medium</span>
+  {% else %}
+    <span class="badge-fl badge-low"><i class="bi bi-check-circle"></i> Low</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  {% if status == 'AVAILABLE' %}
+    <span class="badge-fl badge-status-available"><i class="bi bi-broadcast"></i> Available</span>
+  {% elif status == 'CLAIMED' %}
+    <span class="badge-fl badge-status-claimed"><i class="bi bi-hand-index-thumb"></i> Claimed</span>
+  {% elif status == 'PICKED_UP' %}
+    <span class="badge-fl badge-status-picked_up"><i class="bi bi-check2-circle"></i> Picked Up</span>
+  {% elif status == 'EXPIRED' %}
+    <span class="badge-fl badge-status-expired"><i class="bi bi-clock-history"></i> Expired</span>
+  {% else %}
+    <span class="badge-fl badge-status-cancelled"><i class="bi bi-x-circle"></i> Cancelled</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro match_score_pill(score) %}
+  {% if score >= 75 %}
+    <span class="match-score-pill"><i class="bi bi-stars"></i> {{ score|round|int }}% Match</span>
+  {% elif score >= 45 %}
+    <span class="match-score-pill score-mid"><i class="bi bi-stars"></i> {{ score|round|int }}% Match</span>
+  {% else %}
+    <span class="match-score-pill score-low"><i class="bi bi-stars"></i> {{ score|round|int }}% Match</span>
+  {% endif %}
+{% endmacro %}
