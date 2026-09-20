@@ -11,7 +11,14 @@ from flask import Flask, render_template
 from flask_login import LoginManager, current_user
 
 from config import Config
-from models import db, User, Notification
+from models import (
+    db,
+    User,
+    Notification,
+    ROLE_ADMIN,
+    ROLE_DONOR,
+    ROLE_RECIPIENT,
+)
 
 
 def create_app(config_class=Config):
@@ -75,6 +82,7 @@ def create_app(config_class=Config):
 
     # --- Ensure folders exist -----------------------------------------------
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
     os.makedirs(
         os.path.join(os.path.dirname(__file__), "database"),
         exist_ok=True
@@ -86,10 +94,80 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
+    # --- Create demo accounts if they do not exist --------------------------
+    # This allows the demo login accounts to work automatically on Render
+    # without requiring Render Shell access.
+    with app.app_context():
+
+        demo_users = [
+            {
+                "email": "admin@foodloop.demo",
+                "password": "Admin@123",
+                "name": "FoodLoop Admin",
+                "role": ROLE_ADMIN,
+                "organization_name": "FoodLoop",
+                "phone": "9000000001",
+                "address": "Koramangala, Bengaluru",
+                "area": "Koramangala",
+                "latitude": 12.9352,
+                "longitude": 77.6245,
+                "is_verified": True,
+                "is_active_account": True,
+            },
+            {
+                "email": "donor@foodloop.demo",
+                "password": "Donor@123",
+                "name": "Demo Donor",
+                "role": ROLE_DONOR,
+                "organization_name": "FoodLoop Demo Restaurant",
+                "phone": "9000000002",
+                "address": "Koramangala, Bengaluru",
+                "area": "Koramangala",
+                "latitude": 12.9352,
+                "longitude": 77.6245,
+                "is_verified": True,
+                "is_active_account": True,
+            },
+            {
+                "email": "recipient@foodloop.demo",
+                "password": "Recipient@123",
+                "name": "Demo Recipient",
+                "role": ROLE_RECIPIENT,
+                "organization_name": "FoodLoop Community Kitchen",
+                "phone": "9000000003",
+                "address": "Koramangala, Bengaluru",
+                "area": "Koramangala",
+                "latitude": 12.9352,
+                "longitude": 77.6245,
+                "recipient_type": "Community Kitchen",
+                "daily_meal_capacity": 100,
+                "is_verified": True,
+                "is_active_account": True,
+            },
+        ]
+
+        for data in demo_users:
+
+            existing_user = User.query.filter_by(
+                email=data["email"]
+            ).first()
+
+            if existing_user is None:
+
+                password = data.pop("password")
+
+                user = User(**data)
+                user.set_password(password)
+
+                db.session.add(user)
+
+        db.session.commit()
+
     # --- CLI helper: `flask create-db` --------------------------------------
     @app.cli.command("create-db")
     def create_db():
         """Create all database tables."""
+
         with app.app_context():
             db.create_all()
 
@@ -98,10 +176,19 @@ def create_app(config_class=Config):
     return app
 
 
+# ---------------------------------------------------------------------------
+# Application instance
+# ---------------------------------------------------------------------------
+
 app = create_app()
 
 
+# ---------------------------------------------------------------------------
+# Local development
+# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
+
     with app.app_context():
         db.create_all()
 
